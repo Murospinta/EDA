@@ -86,74 +86,95 @@ bool aberturaFicheiros() {
 }
 
 void adicionaLEspera(Carro carro) {
+    // Se o carro é prioritário, adiciona-o no início da fila
     if (carro.prioritario) {
-        Carro* novaFila = new Carro[++tamanho];
-        novaFila[0] = carro;
+        Carro* novaFila = new Carro[++tamanho]; // Aloca novo vetor com tamanho incrementado em 1
+        novaFila[0] = carro; // Adiciona o carro no início do novo vetor
         for (int i = 0; i < tamanho - 1; i++) {
-            novaFila[i + 1] = LEspera[i];
+            novaFila[i + 1] = LEspera[i]; // Copia os carros do vetor antigo para o novo
         }
-        delete[] LEspera;
-        LEspera = novaFila;
+        delete[] LEspera; // Libera a memória do vetor antigo
+        LEspera = novaFila; // Atualiza o ponteiro do vetor para o novo vetor
     }
+    // Se o carro não é prioritário, adiciona-o no final da fila
     else {
-        Carro* novaFila = new Carro[++tamanho];
+        Carro* novaFila = new Carro[++tamanho]; // Aloca novo vetor com tamanho incrementado em 1
         int j = 0;
         for (int i = 0; i < tamanho - 1; i++) {
-            novaFila[j++] = LEspera[i];
+            novaFila[j++] = LEspera[i]; // Copia os carros do vetor antigo para o novo
         }
-        novaFila[j] = carro;
-        delete[] LEspera;
-        LEspera = novaFila;
+        novaFila[j] = carro; // Adiciona o carro no final do novo vetor
+        delete[] LEspera; // Liberta a memória do vetor antigo
+        LEspera = novaFila; // Atualiza o ponteiro do vetor para o novo vetor
     }
 }
 
+
 void removeLEspera(int indice) {
-    Carro* novaFila = new Carro[--tamanho];
+    Carro* novaFila = new Carro[--tamanho]; // Aloca um novo vetor com tamanho - 1
     int j = 0;
-    for (int i = 0; i < tamanho + 1; i++) { // é tamanho +1 porque o tamanho já foi decrementado!!
-        if (i != indice) {
-            novaFila[j++] = LEspera[i];
+    for (int i = 0; i < tamanho + 1; i++) { // Percorre o vetor antigo
+        if (i != indice) { // Verifica se o índice atual é o índice a ser removido
+            novaFila[j++] = LEspera[i]; // Copia os elementos do vetor antigo para o novo vetor
         }
     }
-    delete[] LEspera;
-    LEspera = novaFila;
+    delete[] LEspera; // Liberta a memória do vetor antigo
+    LEspera = novaFila; // Atualiza o ponteiro da fila para o novo vetor
 }
+
 
 void imprimeLEspera() {
     cout << "Lista de espera : " << endl;
     cout << "----------------- " << endl;
     for (int i = 0; i < tamanho; i++) {
-       cout << "Carro: ";
-       cout <<"\t" << " | ID: " << LEspera[i].id;
-       cout << "\t" << " | Marca: " << LEspera[i].marca;
-       cout << "\t" << " | Modelo: " << LEspera[i].modelo;
-       cout << "\t" << " | Tempo de Reparacao(MAX): " << LEspera[i].tempoReparacaoMax;
-       cout << "\t" << " | Tempo de Reparacao: " << LEspera[i].tempoReparacao;
-       cout << "\t" << " | Prioritario: " << LEspera[i].prioritario << endl;
-       cout << endl;
-       cout << "------------------------------------------------------------" << endl;
-       cout << endl;
+        // Imprime informações sobre cada carro na lista de espera
+        cout << "Carro: ";
+        cout << "\t" << " | ID: " << LEspera[i].id;
+        cout << "\t" << " | Marca: " << LEspera[i].marca;
+        cout << "\t" << " | Modelo: " << LEspera[i].modelo;
+        cout << "\t" << " | Tempo de Reparacao(MAX): " << LEspera[i].tempoReparacaoMax;
+        cout << "\t" << " | Tempo de Reparacao: " << LEspera[i].tempoReparacao;
+        cout << "\t" << " | Prioritario: " << LEspera[i].prioritario << endl;
+        cout << endl;
+        cout << "------------------------------------------------------------" << endl;
+        cout << endl;
     }
 }
 
 void imprimeETs() {
-    int aux = 0; string nome;
+    int aux = 0;
+    string nome;
+
+    // Percorre todas as ETs cadastradas
     for (int i = 0; i < nrETs; i++) {
+
+        // Pede o custo de reparação por dia do mecânico responsável pela ET
         do {
-            cout << "Insira o preco de reparacao por dia (Max 100) do mecanico da ET " << i + 1 << " :" << endl; cin >> aux; ETs[i].responsavel.custo = aux;
+            cout << "Insira o preco de reparacao por dia (Max 100) do mecanico da ET " << i + 1 << " :" << endl;
+            cin >> aux;
+            ETs[i].responsavel.custo = aux;
             cin.ignore(numeric_limits<streamsize>::max(), '\n'); // limpa o buffer
+
+            // Apaga a mensagem anteriormente exibida
             for (int d = 0; d < 2; d++) {
                 cout << "\033[1A"; // Move cursor up one line
                 cout << "\033[2K"; // Erase entire line
             }
+
+        // O custo deve estar entre 0 e 100, caso contrário solicita novamente
         } while (aux > 100 || aux < 0);
+
+        // Pede o nome do responsável pela ET
         cout << "ET " << ETs[i].id << "  ";
         cout << "| Responsavel: ";
         getline(cin, nome);
         ETs[i].responsavel.nome = nome;
+
+        // Apaga a mensagem anteriormente exibida
         cout << "\033[1A"; // Move cursor up one line
         cout << "\033[2K"; // Erase entire line
-        //Apos linha apagada, repeticao das linhas, mas sem o getline
+
+        // Exibe todas as informações da ET, incluindo os carros cadastrados e reparados
         cout << "ID ET: " << ETs[i].id;
         cout << "\t" << " | Nome: " << ETs[i].responsavel.nome;
         cout << "\t" << " | Custo do responsavel: " << ETs[i].responsavel.custo;
@@ -164,6 +185,8 @@ void imprimeETs() {
         cout << "\t" << " | Reparados da ET: " << ETs[i].nrReparados << endl;
         cout << endl;
         cout << "Carros: " << endl;
+
+        // Percorre todos os carros cadastrados na ET
         for (int j = 0; j < ETs[i].nrCarros; j++) {
             cout << "Carro: ";
             cout << "\t" << " | Id: " << ETs[i].carros[j].id;
@@ -171,17 +194,6 @@ void imprimeETs() {
             cout << "\t" << " | Modelo: " << ETs[i].carros[j].modelo;
             cout << "\t" << " | Tempo de Reparacao(MAX): " << ETs[i].carros[j].tempoReparacaoMax;
             cout << "\t" << " | Tempo de Reparacao: " << ETs[i].carros[j].tempoReparacao;
-            cout << "\t" << " | Prioritario: " << ETs[i].carros[j].prioritario << endl;
-        }
-        cout << endl;
-        cout << "Reparados: " << endl;
-        for (int j = 0; j < ETs[i].nrReparados; j++) {
-            cout << "Carro: ";
-            cout << "\t" << " | Id: " << ETs[i].carros[j].id;
-            cout << "\t" << " | Marca: " << ETs[i].reparados[j].marca;
-            cout << "\t" << " | Modelo: " << ETs[i].reparados[j].modelo;
-            cout << "\t" << " | Tempo de Reparacao(MAX): " << ETs[i].reparados[j].tempoReparacaoMax;
-            cout << "\t" << " | Tempo de Reparacao: " << ETs[i].reparados[j].tempoReparacao;
             cout << "\t" << " | Prioritario: " << ETs[i].reparados[j].prioritario << endl;
         }
         cout << endl;
@@ -197,11 +209,14 @@ void inicializacao() {
     nrETs = rand() % 6 + 3;  // Gera um número de ETs aleatório entre 3 e 8
     ETs = new ET[nrETs];
 
+    // Inicializa cada ET
     for (int i = 0; i < nrETs; i++) {
         ETs[i].id = i+1;
-        ETs[i].capacidade = rand() % 4 + 2;  // Gera uma capacidade aleatoria entre 2 e 5
+        ETs[i].capacidade = rand() % 4 + 2;  // Gera uma capacidade aleatória entre 2 e 5
         ETs[i].carros = NULL;
         ETs[i].carros = new Carro[ETs[i].capacidade];
+        
+        // Inicializa cada carro na ET
         for(int j = 0; j < ETs[i].capacidade; j++){
             ETs[i].carros[j].id = 0;
             ETs[i].carros[j].marca = "";
@@ -210,6 +225,7 @@ void inicializacao() {
             ETs[i].carros[j].tempoReparacaoMax = 0;
             ETs[i].carros[j].tempoReparacao = 0;
         }
+        
         ETs[i].nrCarros = 0;
         ETs[i].responsavel.especializacao = marcas[rand() % nrMarcas];
         ETs[i].faturacao = 0;
@@ -217,17 +233,19 @@ void inicializacao() {
         ETs[i].nrReparados = 0;
     }
 
+    // Adiciona 10 carros à lista de espera
     for (int i = 0; i < 10; i++) {
         Carro carro;
         carro.id = ++contadorCarros;
         carro.marca = marcas[rand() % nrMarcas];
         carro.modelo = modelos[rand() % nrModelos];
         carro.prioritario = ((rand() % 20) == 0);
-        carro.tempoReparacaoMax = rand() % 4 + 2;  // Gera uma capacidade aleatoria entre 2 e 5
+        carro.tempoReparacaoMax = rand() % 4 + 2;  // Gera um tempo de reparação aleatório entre 2 e 5
         carro.tempoReparacao = 0;
         adicionaLEspera(carro);
     }
 }
+
 
 void adicionaCarro(Carro** vetor, int* tamanho, Carro carro) {
     Carro* novoVetor = new Carro[*tamanho + 1]; // aloca novo vetor com tamanho + 1
@@ -264,63 +282,65 @@ void removeCarro(Carro** vetor, int* tamanho, Carro carro) {
 
 
 void reparacaoDeCarros() {
-    //cout << "Entrou na reparacao De Carros" << endl;
-    for (int i = 0; i < nrETs; i++) {
-        if (ETs[i].carros) {
-            for (int j = 0; j < ETs[i].nrCarros; j++) {
-                if ((ETs[i].carros[j].tempoReparacaoMax == ETs[i].carros[j].tempoReparacao) || ((rand() % 15) == 0)) {
-                    adicionaCarro(&ETs[i].reparados, &ETs[i].nrReparados, ETs[i].carros[j]);
-                    removeCarro(&ETs[i].carros, &ETs[i].nrCarros, ETs[i].carros[j]);
+    for (int i = 0; i < nrETs; i++) { // Loop para percorrer todas as ETs
+        if (ETs[i].carros) { // Verifica se existem carros na ET atual
+            for (int j = 0; j < ETs[i].nrCarros; j++) { // Loop para percorrer todos os carros na ET atual
+                if ((ETs[i].carros[j].tempoReparacaoMax == ETs[i].carros[j].tempoReparacao) || ((rand() % 15) == 0)) { // Verifica se o carro atual deve ser reparado ou não
+                    adicionaCarro(&ETs[i].reparados, &ETs[i].nrReparados, ETs[i].carros[j]); // Adiciona o carro reparado ao vetor "reparados" na ET atual
+                    removeCarro(&ETs[i].carros, &ETs[i].nrCarros, ETs[i].carros[j]); // Remove o carro reparado do vetor "carros" na ET atual
                 }
                 else {
-                    ETs[i].carros[j].tempoReparacao++;
+                    ETs[i].carros[j].tempoReparacao++; // Incrementa o tempo de reparação do carro atual na ET atual
                 }
             }
-            ETs[i].faturacao += ETs[i].responsavel.custo; // assim o dia da reparação conta para a faturação
+            ETs[i].faturacao += ETs[i].responsavel.custo; // Adiciona o custo da reparação atual à faturação total da ET atual
         }
     }
 }
+
 
 void dezCarrosNovos() {
     //cout << "Entrou na dezCarrosNovos" << endl;
-    string* marcasDisponiveis = new string[nrETs];
-    for (int i = 0; i < 10; i++) {
-        for (int j = 0; j < nrETs; j++) marcasDisponiveis[j] = ETs[j].responsavel.especializacao;
-        Carro carro;
-        carro.id = ++contadorCarros;
-        carro.marca = marcasDisponiveis[rand() % nrETs];
-        carro.modelo = modelos[rand() % nrModelos];
-        carro.prioritario = ((rand() % 20) == 0);
-        carro.tempoReparacaoMax = rand() % 4 + 2;  // Gera um tempo de reparação max aleatorio entre 2 e 5
-        carro.tempoReparacao = 0;
-        adicionaLEspera(carro);
+    string* marcasDisponiveis = new string[nrETs]; // aloca dinamicamente uma array de strings para armazenar as marcas disponíveis para a compra
+    for (int i = 0; i < 10; i++) { // gera 10 novos carros
+        for (int j = 0; j < nrETs; j++) marcasDisponiveis[j] = ETs[j].responsavel.especializacao; // preenche a array de marcas disponíveis com as especializações dos técnicos responsáveis de cada ET
+        Carro carro; // cria um novo carro
+        carro.id = ++contadorCarros; // atribui um id ao carro e incrementa o contador de carros
+        carro.marca = marcasDisponiveis[rand() % nrETs]; // escolhe aleatoriamente uma marca disponível
+        carro.modelo = modelos[rand() % nrModelos]; // escolhe aleatoriamente um modelo
+        carro.prioritario = ((rand() % 20) == 0); // determina aleatoriamente se o carro é prioritário
+        carro.tempoReparacaoMax = rand() % 4 + 2;  // gera aleatoriamente um tempo máximo de reparação entre 2 e 5 dias
+        carro.tempoReparacao = 0; // inicializa o tempo de reparação com 0
+        adicionaLEspera(carro); // adiciona o carro à lista de espera para reparação
     }
-    delete[] marcasDisponiveis;
+    delete[] marcasDisponiveis; // liberta a memória alocada para a array de marcas disponíveis
 }
+
 
 void colocaOitoCarrosNasETs() {
     //cout << "Entrou na coloca8" << endl;
-    int proximo = 0;
-    int j = 0;
-    bool encontrouET = false;
-    while (j < 8 && proximo < tamanho) {
-        encontrouET = false;
-        for (int i = 0; i < nrETs; i++) {
-            if ((LEspera[proximo].marca == ETs[i].responsavel.especializacao) && (ETs[i].capacidade > ETs[i].nrCarros)) {
-                adicionaCarro(&ETs[i].carros, &ETs[i].nrCarros, LEspera[proximo]);
+    int proximo = 0; // índice do próximo carro a ser verificado na lista de espera
+    int j = 0; // contador de carros colocados nas ETs
+    bool encontrouET = false; // flag para indicar se uma ET adequada foi encontrada
+    while (j < 8 && proximo < tamanho) { // enquanto não foram colocados 8 carros e ainda há carros na lista de espera
+        encontrouET = false; // reset da flag
+        for (int i = 0; i < nrETs; i++) { // percorrer as ETs
+            if ((LEspera[proximo].marca == ETs[i].responsavel.especializacao) && (ETs[i].capacidade > ETs[i].nrCarros)) { // se a especialização da ET e a marca do carro na lista de espera são compatíveis e a capacidade da ET ainda não foi atingida
+                adicionaCarro(&ETs[i].carros, &ETs[i].nrCarros, LEspera[proximo]); // adicionar o carro à ET
                 //cout << "antes do removelespera" << endl;
-                removeLEspera(proximo);
+                removeLEspera(proximo); // remover o carro da lista de espera
                 //cout << "depois do removelespera" << endl;
-                j++;
-                encontrouET = true;
-                break;
+                j++; // incrementar o contador de carros colocados nas ETs
+                encontrouET = true; // marcar que uma ET adequada foi encontrada
+                break; // sair do loop for
             }
         }
-        if (!encontrouET) {
-            proximo++;
+        if (!encontrouET) { // se não foi encontrada nenhuma ET adequada
+            proximo++; // verificar o próximo carro na lista de espera
         }
     }
 }
+
 
 void reparacao_manual() {
     string marca_rep = "",modelo_rep = "";
@@ -415,7 +435,7 @@ void imprimeETs_ciclo() {
     cout << endl;
     cout << "Reparados: " << endl;
         for (int j = 0; j < ETs[i].nrReparados; j++) {
-        cout << "Carro: ";
+        cout << "\t" << "Carro: ";
         cout << "\t" << " | Id: " << ETs[i].carros[j].id;
         cout << "\t" << " | Marca: " << ETs[i].reparados[j].marca;
         cout << "\t" << " | Modelo: " << ETs[i].reparados[j].modelo;
